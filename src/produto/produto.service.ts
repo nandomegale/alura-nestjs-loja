@@ -17,7 +17,7 @@ export class ProdutoService {
     const produtoEntity = new ProdutoEntity();
     //produtoEntity.id = randomUUID();
     produtoEntity.nome = createProdutoDto.nome;
-    produtoEntity.usuarioId = createProdutoDto.usuarioId;
+    //produtoEntity.usuarioId = createProdutoDto.usuarioId;
     produtoEntity.valor = createProdutoDto.valor;
     produtoEntity.quantidadeDisponivel = createProdutoDto.quantidadeDisponivel;
     produtoEntity.descricao = createProdutoDto.descricao;

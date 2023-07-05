@@ -58,13 +58,6 @@ export class ProdutoImagemDTO {
 }
 
 export class CreateProdutoDto {
-  @IsString({
-    message: 'usuário id deve ser uma string!',
-  })
-  @IsNotEmpty({
-    message: 'usuário id não pode ser vazio!',
-  })
-  usuarioId: string;
 
   @IsString({
     message: 'nome deve ser uma string!',

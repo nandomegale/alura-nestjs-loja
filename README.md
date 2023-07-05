@@ -71,3 +71,12 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 ## License
 
 Nest is [MIT licensed](LICENSE).
+
+comandos usados:
+docker-compose up -d
+typeorm-ts-node-esm -d src/db/data-source-cli.ts migration:show
+npm run typeorm migration:generate src/db/migrations/cria-tabelas
+npm run typeorm migration:generate src/db/migrations/altera-tabela-produtos
+npm run typeorm migration:run
+npm run typeorm migration:revert
+npm run typeorm migration:generate src/db/migrations/remove-usuarioid-tabela-produtos
