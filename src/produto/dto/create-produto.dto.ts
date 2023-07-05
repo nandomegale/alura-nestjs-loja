@@ -84,7 +84,7 @@ export class CreateProdutoDto {
   @IsNotEmpty({
     message: 'quantidade não pode ser vazio!',
   })
-  quantidade: number;
+  quantidadeDisponivel: number;
 
   @IsString({
     message: 'descrição deve ser uma string!',

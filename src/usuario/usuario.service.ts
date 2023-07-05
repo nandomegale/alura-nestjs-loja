@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { UsuarioEntity } from './usuario.entity';
 import { ListaUsuarioDTO } from './dtos/ListaUsuario.dto';
 import { AtualizaUsuarioDTO } from './dtos/AtualizaUsuario.dto';
+import { CriaUsuarioDTO } from './dtos/CriaUsuario.dto';
 
 @Injectable()
 export class UsuarioService {
@@ -20,8 +21,13 @@ export class UsuarioService {
     return usuariosLista;
   }
 
-  async criarUsuario(usuario: UsuarioEntity) {
-    await this.usuarioRepository.save(usuario);
+  async criarUsuario(criaUsuarioDTO: CriaUsuarioDTO) {
+    const usuarioEntity = new UsuarioEntity();
+    usuarioEntity.nome = criaUsuarioDTO.nome;
+    usuarioEntity.email = criaUsuarioDTO.email;
+    usuarioEntity.senha = criaUsuarioDTO.senha;
+    //usuarioEntity.id = randomUUID();
+    return this.usuarioRepository.save(usuarioEntity);
   }
 
   async atualizaUsuario(id: string, usuario: AtualizaUsuarioDTO) {

@@ -1,4 +1,10 @@
-import { IsString, IsEmail, MinLength, IsNotEmpty, IsOptional } from 'class-validator';
+import {
+  IsString,
+  IsEmail,
+  MinLength,
+  IsNotEmpty,
+  IsOptional,
+} from 'class-validator';
 import { EmailEhUnico } from '../validators/emeail-eh-unico.validator';
 
 export class AtualizaUsuarioDTO {

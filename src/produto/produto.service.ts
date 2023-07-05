@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { randomUUID } from 'crypto';
+import { Repository } from 'typeorm';
 import { CreateProdutoDto } from './dto/create-produto.dto';
 import { UpdateProdutoDto } from './dto/update-produto.dto';
-import { InjectRepository } from '@nestjs/typeorm';
 import { ProdutoEntity } from './entities/produto.entity';
-import { Repository } from 'typeorm';
 
 @Injectable()
 export class ProdutoService {
@@ -13,7 +14,17 @@ export class ProdutoService {
   ) {}
 
   async create(createProdutoDto: CreateProdutoDto) {
-    return await this.produtoRepository.save(createProdutoDto);
+    const produtoEntity = new ProdutoEntity();
+    //produtoEntity.id = randomUUID();
+    produtoEntity.nome = createProdutoDto.nome;
+    produtoEntity.usuarioId = createProdutoDto.usuarioId;
+    produtoEntity.valor = createProdutoDto.valor;
+    produtoEntity.quantidadeDisponivel = createProdutoDto.quantidadeDisponivel;
+    produtoEntity.descricao = createProdutoDto.descricao;
+    produtoEntity.categoria = createProdutoDto.categoria;
+    produtoEntity.caracteristicas = createProdutoDto.caracteristicas;
+    produtoEntity.imagens = createProdutoDto.imagens;
+    return this.produtoRepository.save(produtoEntity);
   }
 
   async findAll() {
