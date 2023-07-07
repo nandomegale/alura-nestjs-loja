@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 //import { UsuarioRepository } from './usuario.repository';
 import { CriaUsuarioDTO } from './dtos/CriaUsuario.dto';
-import { UsuarioEntity } from './usuario.entity';
+import { UsuarioEntity } from './entities/usuario.entity';
 import { randomUUID } from 'node:crypto';
 import { ListaUsuarioDTO } from './dtos/ListaUsuario.dto';
 import { AtualizaUsuarioDTO } from './dtos/AtualizaUsuario.dto';

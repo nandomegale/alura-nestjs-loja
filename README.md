@@ -80,3 +80,4 @@ npm run typeorm migration:generate src/db/migrations/altera-tabela-produtos
 npm run typeorm migration:run
 npm run typeorm migration:revert
 npm run typeorm migration:generate src/db/migrations/remove-usuarioid-tabela-produtos
+nest g resource pedido --no-spec

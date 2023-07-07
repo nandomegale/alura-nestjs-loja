@@ -1,3 +1,4 @@
+import { ItemPedidoEntity } from '../../pedido/entities/item-pedido.entity';
 import {
   Column,
   CreateDateColumn,
@@ -52,4 +53,7 @@ export class ProdutoEntity {
 
   @DeleteDateColumn({ name: 'deleted_at' })
   deletedAt: string;
+
+  @OneToMany(() => ItemPedidoEntity, (itemPedido) => itemPedido.produto)
+  itensPedido: ItemPedidoEntity[];
 }
