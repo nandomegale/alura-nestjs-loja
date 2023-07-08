@@ -12,7 +12,7 @@ import { CreatePedidoDTO } from './dto/create-pedido.dto';
 import { UpdatePedidoDto } from './dto/update-pedido.dto';
 import { PedidoService } from './pedido.service';
 
-@Controller('pedido')
+@Controller('pedidos')
 export class PedidoController {
   constructor(private readonly pedidoService: PedidoService) {}
 
@@ -44,7 +44,7 @@ export class PedidoController {
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updatePedidoDto: UpdatePedidoDto) {
-    return this.pedidoService.update(+id, updatePedidoDto);
+    return this.pedidoService.update(id, updatePedidoDto);
   }
 
   @Delete(':id')

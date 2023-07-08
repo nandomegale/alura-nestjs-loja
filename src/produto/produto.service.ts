@@ -1,6 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { randomUUID } from 'crypto';
 import { Repository } from 'typeorm';
 import { CreateProdutoDto } from './dto/create-produto.dto';
 import { UpdateProdutoDto } from './dto/update-produto.dto';
@@ -24,7 +23,7 @@ export class ProdutoService {
     produtoEntity.categoria = createProdutoDto.categoria;
     produtoEntity.caracteristicas = createProdutoDto.caracteristicas;
     produtoEntity.imagens = createProdutoDto.imagens;
-    return this.produtoRepository.save(produtoEntity);
+    return await this.produtoRepository.save(produtoEntity);
   }
 
   async findAll() {
@@ -36,7 +35,15 @@ export class ProdutoService {
   }
 
   async update(id: string, updateProdutoDto: UpdateProdutoDto) {
-    return await this.produtoRepository.update(id, updateProdutoDto);
+    const produtoEntity = await this.produtoRepository.findOneBy({ id });
+
+    if (produtoEntity === null) {
+      throw new NotFoundException('Produto não encontrado');
+    }
+
+    Object.assign(produtoEntity, updateProdutoDto);
+
+    return await this.produtoRepository.save(produtoEntity);
   }
 
   async remove(id: string) {

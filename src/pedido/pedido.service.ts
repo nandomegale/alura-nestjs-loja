@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { ProdutoEntity } from '../produto/entities/produto.entity';
@@ -20,8 +24,33 @@ export class PedidoService {
     private readonly produtoRepository: Repository<ProdutoEntity>,
   ) {}
 
+  private trataDadosDoPedido(
+    dadosDoPedido: CreatePedidoDTO,
+    produtoRelacionados: ProdutoEntity[],
+  ) {
+    dadosDoPedido.itensPedido.forEach((itemPedido) => {
+      const produtoRelacionado = produtoRelacionados.find(
+        (produto) => produto.id === itemPedido.produtoId,
+      );
+      if (produtoRelacionado === undefined) {
+        throw new NotFoundException(
+          `O Produto com id: ${itemPedido.produtoId} não foi encontrado`,
+        );
+      }
+      if (itemPedido.quantidade > produtoRelacionado.quantidadeDisponivel) {
+        throw new BadRequestException(
+          `A quantidade solicitada '${itemPedido.quantidade}' é maior do que a quantidade disponível '${produtoRelacionado.quantidadeDisponivel}' do produto '${produtoRelacionado.nome}'`,
+        );
+      }
+    });
+  }
+
   async create(usuarioId: string, dadosDoPedido: CreatePedidoDTO) {
     const usuario = await this.usuarioRepository.findOneBy({ id: usuarioId });
+
+    if (usuario === null) {
+      throw new NotFoundException('Usuário não encontrado');
+    }
 
     const produtosId = dadosDoPedido.itensPedido.map(
       (itemPedido) => itemPedido.produtoId,
@@ -35,13 +64,16 @@ export class PedidoService {
     pedidoEntity.status = StatusPedido.EM_PROCESSAMENTO;
     pedidoEntity.usuario = usuario;
 
+    this.trataDadosDoPedido(dadosDoPedido, produtoRelacionados);
+
     const itensPedidoEntity = dadosDoPedido.itensPedido.map((itemPedido) => {
       const produtoRelacionado = produtoRelacionados.find(
         (produto) => produto.id === itemPedido.produtoId,
       );
+
       const itemPedidoEntity = new ItemPedidoEntity();
-      itemPedidoEntity.produto = produtoRelacionado;
-      itemPedidoEntity.precoVenda = produtoRelacionado.valor;
+      itemPedidoEntity.produto = produtoRelacionado!;
+      itemPedidoEntity.precoVenda = produtoRelacionado!.valor;
       itemPedidoEntity.quantidade = itemPedido.quantidade;
       itemPedidoEntity.produto.quantidadeDisponivel -= itemPedido.quantidade;
       return itemPedidoEntity;
@@ -79,8 +111,17 @@ export class PedidoService {
     return `This action returns a #${id} pedido`;
   }
 
-  update(id: number, updatePedidoDto: UpdatePedidoDto) {
-    return `This action updates a #${id} pedido`;
+  async update(id: string, updatePedidoDto: UpdatePedidoDto) {
+    const pedido = await this.pedidoRepository.findOneBy({ id });
+
+    // throw new Error('Simulando erro...')
+    if (pedido === null) {
+      throw new NotFoundException('Pedido não encontrado');
+    }
+
+    Object.assign(pedido, updatePedidoDto);
+
+    return await this.pedidoRepository.save(pedido);
   }
 
   remove(id: number) {
