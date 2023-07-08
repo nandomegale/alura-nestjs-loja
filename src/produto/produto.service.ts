@@ -14,15 +14,11 @@ export class ProdutoService {
 
   async create(createProdutoDto: CreateProdutoDto) {
     const produtoEntity = new ProdutoEntity();
-    //produtoEntity.id = randomUUID();
-    produtoEntity.nome = createProdutoDto.nome;
-    //produtoEntity.usuarioId = createProdutoDto.usuarioId;
-    produtoEntity.valor = createProdutoDto.valor;
-    produtoEntity.quantidadeDisponivel = createProdutoDto.quantidadeDisponivel;
-    produtoEntity.descricao = createProdutoDto.descricao;
-    produtoEntity.categoria = createProdutoDto.categoria;
-    produtoEntity.caracteristicas = createProdutoDto.caracteristicas;
-    produtoEntity.imagens = createProdutoDto.imagens;
+
+    //refatorando todo a atribuição manual para Object.assign
+    //fazer o Type Assertion serve para detectar se há diferenças entre as propriedades dos objetos
+    Object.assign(produtoEntity, createProdutoDto as ProdutoEntity);
+
     return await this.produtoRepository.save(produtoEntity);
   }
 
@@ -41,12 +37,17 @@ export class ProdutoService {
       throw new NotFoundException('Produto não encontrado');
     }
 
+    //o Type Assertion neste caso não acusaria erro pois todas as propriedades do DTO são opcionais
     Object.assign(produtoEntity, updateProdutoDto);
 
     return await this.produtoRepository.save(produtoEntity);
   }
 
   async remove(id: string) {
-    return await this.produtoRepository.delete(id);
+    const result = await this.produtoRepository.delete(id);
+
+    if (!result.affected) {
+      throw new NotFoundException('Produto não encontrado');
+    }
   }
 }

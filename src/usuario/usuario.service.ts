@@ -1,10 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { UsuarioEntity } from './entities/usuario.entity';
-import { ListaUsuarioDTO } from './dtos/ListaUsuario.dto';
 import { AtualizaUsuarioDTO } from './dtos/AtualizaUsuario.dto';
 import { CriaUsuarioDTO } from './dtos/CriaUsuario.dto';
+import { ListaUsuarioDTO } from './dtos/ListaUsuario.dto';
+import { UsuarioEntity } from './entities/usuario.entity';
 
 @Injectable()
 export class UsuarioService {
@@ -23,19 +23,32 @@ export class UsuarioService {
 
   async criarUsuario(criaUsuarioDTO: CriaUsuarioDTO) {
     const usuarioEntity = new UsuarioEntity();
-    usuarioEntity.nome = criaUsuarioDTO.nome;
-    usuarioEntity.email = criaUsuarioDTO.email;
-    usuarioEntity.senha = criaUsuarioDTO.senha;
-    //usuarioEntity.id = randomUUID();
+
+    //refatorando todo a atribuição manual para Object.assign
+    //fazer o Type Assertion serve para detectar se há diferenças entre as propriedades dos objetos
+    Object.assign(usuarioEntity, criaUsuarioDTO as UsuarioEntity);
+
     return this.usuarioRepository.save(usuarioEntity);
   }
 
-  async atualizaUsuario(id: string, usuario: AtualizaUsuarioDTO) {
-    await this.usuarioRepository.update(id, usuario);
+  async atualizaUsuario(id: string, atualizaUsuarioDTO: AtualizaUsuarioDTO) {
+    const usuario = await this.usuarioRepository.findOneBy({ id });
+
+    if (usuario === null) {
+      throw new NotFoundException('Usuário não encontrado!');
+    }
+
+    Object.assign(usuario, atualizaUsuarioDTO);
+
+    return await this.usuarioRepository.save(usuario);
   }
 
   async deletaUsuario(id: string) {
-    await this.usuarioRepository.delete(id);
+    const result = await this.usuarioRepository.delete(id);
+
+    if (!result.affected) {
+      throw new NotFoundException('Usuário não foi encontrado');
+    }
   }
 
   async existeComEmail(email: string) {
